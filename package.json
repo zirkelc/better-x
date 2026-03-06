@@ -1,0 +1,21 @@
+{
+  "name": "better-x",
+  "version": "1.0.0",
+  "description": "Chrome extension that enhances X/Twitter post composer with character counting and tooltips",
+  "type": "module",
+  "scripts": {
+    "dev": "tsdown --watch",
+    "build": "tsdown",
+    "package": "pnpm build && cp manifest.json dist/ && cp styles/content.css dist/ && cp -r icons dist/",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": ["chrome-extension", "twitter", "x"],
+  "author": "Chris Cook",
+  "license": "MIT",
+  "packageManager": "pnpm@10.29.3",
+  "devDependencies": {
+    "@types/chrome": "^0.1.37",
+    "tsdown": "^0.20.3",
+    "typescript": "^5.9.3"
+  }
+}
