@@ -4,18 +4,27 @@
   "description": "Chrome extension that enhances X/Twitter post composer with character counting and tooltips",
   "type": "module",
   "scripts": {
-    "dev": "tsdown --watch",
-    "build": "tsdown",
-    "package": "pnpm build && cp manifest.json dist/ && cp styles/content.css dist/ && cp -r icons dist/",
-    "typecheck": "tsc --noEmit"
+    "dev": "wxt",
+    "dev:firefox": "wxt -b firefox",
+    "build": "wxt build",
+    "build:firefox": "wxt build -b firefox",
+    "zip": "wxt zip",
+    "zip:firefox": "wxt zip -b firefox",
+    "typecheck": "wxt prepare && tsc --noEmit",
+    "icons": "node scripts/generate-icons.mjs",
+    "postinstall": "wxt prepare"
   },
-  "keywords": ["chrome-extension", "twitter", "x"],
+  "keywords": [
+    "chrome-extension",
+    "twitter",
+    "x"
+  ],
   "author": "Chris Cook",
   "license": "MIT",
   "packageManager": "pnpm@10.29.3",
   "devDependencies": {
-    "@types/chrome": "^0.1.37",
-    "tsdown": "^0.20.3",
-    "typescript": "^5.9.3"
+    "sharp": "^0.34.5",
+    "typescript": "^5.9.3",
+    "wxt": "^0.20.25"
   }
 }

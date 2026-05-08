@@ -1,5 +1,5 @@
-import { CLASS_PREFIX, DATA_INITIALIZED } from '../utils/constants';
-import { getCharCount } from '../utils/text';
+import { CLASS_PREFIX, DATA_INITIALIZED } from '../../utils/constants';
+import { getCharCount } from '../../utils/text';
 
 const OVERLAY_CLASS = `${CLASS_PREFIX}-overlay`;
 const WORD_CLASS = `${CLASS_PREFIX}-word`;

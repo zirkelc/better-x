@@ -1,4 +1,4 @@
-import { CLASS_PREFIX, SELECTORS } from '../utils/constants';
+import { CLASS_PREFIX, SELECTORS } from '../../utils/constants';
 
 const FORMAT_GROUP_CLASS = `${CLASS_PREFIX}-format-group`;
 const FORMAT_BTN_CLASS = `${CLASS_PREFIX}-format-btn`;
