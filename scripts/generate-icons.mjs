@@ -4,12 +4,19 @@ import { fileURLToPath } from 'node:url';
 import sharp from 'sharp';
 
 const here = dirname(fileURLToPath(import.meta.url));
-const iconDir = join(here, '..', 'public', 'icon');
-const svg = readFileSync(join(iconDir, 'icon.svg'));
+const publicDir = join(here, '..', 'public');
+const iconDir = join(publicDir, 'icon');
 
+const iconSvg = readFileSync(join(iconDir, 'icon.svg'));
 for (const size of [16, 48, 128]) {
   const out = join(iconDir, `${size}.png`);
-  const data = await sharp(svg).resize(size, size).png().toBuffer();
+  const data = await sharp(iconSvg).resize(size, size).png().toBuffer();
   writeFileSync(out, data);
   console.log(`wrote ${out} (${data.length} bytes)`);
 }
+
+const ogSvg = readFileSync(join(publicDir, 'og-image.svg'));
+const ogOut = join(publicDir, 'og-image.png');
+const ogData = await sharp(ogSvg).resize(640, 320).png().toBuffer();
+writeFileSync(ogOut, ogData);
+console.log(`wrote ${ogOut} (${ogData.length} bytes)`);
