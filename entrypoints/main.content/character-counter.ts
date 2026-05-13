@@ -20,6 +20,25 @@ type CounterState = { element: HTMLElement; cleanup: () => void };
 const stateByTextarea = new WeakMap<Element, CounterState>();
 
 function getTextFromTextarea(textarea: Element): string {
+  /**
+   * X's compose uses Draft.js, which wraps each paragraph in a
+   * [data-block="true"] div. textContent collapses these into one line and
+   * innerText adds extra trailing newlines, both diverging from what X
+   * actually posts. Walking the block divs and joining their text with \n
+   * mirrors Selection.toString() — same number the selection tooltip and
+   * X's own counter agree on. Falls back to direct children, then to
+   * textContent for editors with a different structure.
+   */
+  const draftBlocks = textarea.querySelectorAll('[data-block="true"]');
+  if (draftBlocks.length > 0) {
+    return Array.from(draftBlocks)
+      .map((b) => b.textContent || '')
+      .join('\n');
+  }
+  const children = Array.from(textarea.children);
+  if (children.length > 0) {
+    return children.map((c) => c.textContent || '').join('\n');
+  }
   return textarea.textContent || '';
 }
 

@@ -1,239 +1,155 @@
-import { CLASS_PREFIX, SELECTORS } from '../../utils/constants';
+import { CLASS_PREFIX } from '../../utils/constants';
 
-const FORMAT_GROUP_CLASS = `${CLASS_PREFIX}-format-group`;
 const FORMAT_BTN_CLASS = `${CLASS_PREFIX}-format-btn`;
+const GROUP_INJECTED_ATTR = 'data-better-x-format-injected';
 
-/** Shared format container element */
-let formatContainer: HTMLElement | null = null;
-
-/**
- * Convert a character to Mathematical Monospace Unicode
- */
+/** Convert a character to Mathematical Monospace Unicode. */
 function toMonospace(char: string): string {
   const code = char.charCodeAt(0);
-  /** A-Z → U+1D670 - U+1D689 */
-  if (code >= 65 && code <= 90) {
-    return String.fromCodePoint(0x1d670 + code - 65);
-  }
-  /** a-z → U+1D68A - U+1D6A3 */
-  if (code >= 97 && code <= 122) {
-    return String.fromCodePoint(0x1d68a + code - 97);
-  }
-  /** 0-9 → U+1D7F6 - U+1D7FF */
-  if (code >= 48 && code <= 57) {
-    return String.fromCodePoint(0x1d7f6 + code - 48);
-  }
+  if (code >= 65 && code <= 90) return String.fromCodePoint(0x1d670 + code - 65);
+  if (code >= 97 && code <= 122) return String.fromCodePoint(0x1d68a + code - 97);
+  if (code >= 48 && code <= 57) return String.fromCodePoint(0x1d7f6 + code - 48);
   return char;
 }
 
-/**
- * Convert a Mathematical Monospace character back to regular ASCII
- */
+/** Convert a Mathematical Monospace character back to regular ASCII. */
 function fromMonospace(char: string): string {
   const code = char.codePointAt(0);
-  if (code === undefined) {
-    return char;
-  }
-  /** Mathematical Monospace A-Z: U+1D670 - U+1D689 */
-  if (code >= 0x1d670 && code <= 0x1d689) {
-    return String.fromCharCode(65 + code - 0x1d670);
-  }
-  /** Mathematical Monospace a-z: U+1D68A - U+1D6A3 */
-  if (code >= 0x1d68a && code <= 0x1d6a3) {
-    return String.fromCharCode(97 + code - 0x1d68a);
-  }
-  /** Mathematical Monospace 0-9: U+1D7F6 - U+1D7FF */
-  if (code >= 0x1d7f6 && code <= 0x1d7ff) {
-    return String.fromCharCode(48 + code - 0x1d7f6);
-  }
+  if (code === undefined) return char;
+  if (code >= 0x1d670 && code <= 0x1d689) return String.fromCharCode(65 + code - 0x1d670);
+  if (code >= 0x1d68a && code <= 0x1d6a3) return String.fromCharCode(97 + code - 0x1d68a);
+  if (code >= 0x1d7f6 && code <= 0x1d7ff) return String.fromCharCode(48 + code - 0x1d7f6);
   return char;
 }
 
-/**
- * Format text as monospace code
- */
 function formatAsCode(text: string): string {
   return [...text].map(toMonospace).join('');
 }
 
-/**
- * Format monospace text back to normal ASCII
- */
 function formatAsNormal(text: string): string {
   return [...text].map(fromMonospace).join('');
 }
 
 /**
- * Create a format button element
+ * X's floating selection toolbar contains buttons with exact aria-label
+ * "Bold" and "Italic" (the toolbar buttons in the composer use
+ * "Bold, (⌘+B)" — the parens distinguish them). Returns the group div when
+ * both are present.
  */
-function createFormatButton(
-  format: 'code' | 'normal',
+function findXFormattingGroup(): Element | null {
+  const buttons = document.querySelectorAll('button[aria-label="Bold"]');
+  for (const bold of buttons) {
+    const parent = bold.parentElement;
+    if (!parent) continue;
+    if (parent.querySelector('button[aria-label="Italic"]')) {
+      return parent;
+    }
+  }
+  return null;
+}
+
+/**
+ * Build a button that visually matches the surrounding Bold/Italic buttons
+ * by reusing their classes, but with our own label and click behavior.
+ */
+function buildFormatButton(
+  template: HTMLButtonElement,
   label: string,
-  ariaLabel: string,
+  text: string,
+  onClick: () => void,
 ): HTMLButtonElement {
   const btn = document.createElement('button');
-  btn.className = FORMAT_BTN_CLASS;
-  btn.textContent = label;
-  btn.setAttribute('type', 'button');
-  btn.setAttribute('aria-label', ariaLabel);
-  btn.dataset.format = format;
+  btn.className = template.className;
+  btn.classList.add(FORMAT_BTN_CLASS);
+  btn.type = 'button';
+  btn.setAttribute('role', 'button');
+  btn.setAttribute('aria-label', label);
+
+  const innerTemplate = template.querySelector(':scope > div');
+  const inner = document.createElement('div');
+  if (innerTemplate) {
+    inner.className = innerTemplate.className;
+  }
+  inner.textContent = text;
+  btn.appendChild(inner);
+
+  /** Prevent losing the selection when the user mouses down on the button. */
+  btn.addEventListener('mousedown', (e) => e.preventDefault());
+  btn.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    onClick();
+  });
+
   return btn;
 }
 
-/**
- * Get or create the format container with both buttons
- */
-function getFormatContainer(): HTMLElement {
-  if (!formatContainer) {
-    formatContainer = document.createElement('div');
-    formatContainer.className = FORMAT_GROUP_CLASS;
+function applyFormat(transform: (text: string) => string): void {
+  const sel = window.getSelection();
+  if (!sel || sel.isCollapsed || sel.rangeCount === 0) return;
+  const text = sel.toString();
+  if (!text) return;
 
-    const codeBtn = createFormatButton('code', '</>', 'Format as code');
-    const normalBtn = createFormatButton('normal', 'Aa', 'Format as normal text');
+  const formatted = transform(text);
+  document.execCommand('insertText', false, formatted);
 
-    formatContainer.appendChild(codeBtn);
-    formatContainer.appendChild(normalBtn);
-
-    formatContainer.addEventListener('click', handleFormatClick);
-    formatContainer.addEventListener('mousedown', (e) => {
-      /** Prevent losing selection when clicking button */
-      e.preventDefault();
-    });
-
-    document.body.appendChild(formatContainer);
-  }
-  return formatContainer;
+  /**
+   * execCommand collapses the selection at the end of the inserted text.
+   * Re-extend it backward by the formatted string's length (in UTF-16 code
+   * units — same units DOM offsets use, so surrogate-pair monospace chars
+   * work) so the user can immediately re-apply or copy the result.
+   */
+  const after = window.getSelection();
+  if (!after || after.rangeCount === 0) return;
+  const range = after.getRangeAt(0);
+  const endContainer = range.endContainer;
+  const endOffset = range.endOffset;
+  const newStart = endOffset - formatted.length;
+  if (newStart < 0) return;
+  const newRange = document.createRange();
+  newRange.setStart(endContainer, newStart);
+  newRange.setEnd(endContainer, endOffset);
+  after.removeAllRanges();
+  after.addRange(newRange);
 }
 
-/**
- * Show format container at position
- */
-function showFormatContainer(x: number, y: number): void {
-  const container = getFormatContainer();
-  container.style.left = `${x}px`;
-  container.style.top = `${y}px`;
-  container.style.display = 'flex';
+function injectIntoGroup(group: Element): void {
+  if (group.hasAttribute(GROUP_INJECTED_ATTR)) return;
+  const template = group.querySelector('button') as HTMLButtonElement | null;
+  if (!template) return;
+
+  const codeBtn = buildFormatButton(template, 'Code', '</>', () =>
+    applyFormat(formatAsCode),
+  );
+  const normalBtn = buildFormatButton(template, 'Normal', 'Aa', () =>
+    applyFormat(formatAsNormal),
+  );
+
+  group.appendChild(codeBtn);
+  group.appendChild(normalBtn);
+  group.setAttribute(GROUP_INJECTED_ATTR, '1');
 }
 
-/**
- * Hide format container
- */
-function hideFormatContainer(): void {
-  if (formatContainer) {
-    formatContainer.style.display = 'none';
-  }
-}
-
-/**
- * Check if selection is within X's textarea
- */
-function getTextareaSelection(): { textarea: Element; selection: Selection } | null {
-  const selection = window.getSelection();
-  if (!selection || selection.isCollapsed || selection.rangeCount === 0) {
-    return null;
-  }
-
-  const anchorNode = selection.anchorNode;
-  const focusNode = selection.focusNode;
-  if (!anchorNode || !focusNode) {
-    return null;
-  }
-
-  /** Find textarea containing the selection */
-  let textarea = document.querySelector(SELECTORS.TEXTAREA);
-  if (!textarea) {
-    textarea = document.querySelector(SELECTORS.TEXTBOX_FALLBACK);
-  }
-
-  if (!textarea) {
-    return null;
-  }
-
-  if (!textarea.contains(anchorNode) || !textarea.contains(focusNode)) {
-    return null;
-  }
-
-  return { textarea, selection };
-}
-
-/**
- * Handle format button click
- */
-function handleFormatClick(e: Event): void {
-  const target = e.target as HTMLElement;
-  const format = target.dataset.format as 'code' | 'normal' | undefined;
-  if (!format) {
-    return;
-  }
-
-  const result = getTextareaSelection();
-  if (!result) {
-    hideFormatContainer();
-    return;
-  }
-
-  const { selection } = result;
-  const selectedText = selection.toString();
-  if (!selectedText) {
-    hideFormatContainer();
-    return;
-  }
-
-  const formattedText = format === 'code'
-    ? formatAsCode(selectedText)
-    : formatAsNormal(selectedText);
-
-  /** Replace selection using execCommand for undo support */
-  document.execCommand('insertText', false, formattedText);
-
-  hideFormatContainer();
-}
-
-/**
- * Handle selection change
- */
-function handleSelectionChange(): void {
-  const result = getTextareaSelection();
-  if (!result) {
-    hideFormatContainer();
-    return;
-  }
-
-  const { selection } = result;
-  const selectedText = selection.toString();
-  if (!selectedText) {
-    hideFormatContainer();
-    return;
-  }
-
-  /** Position container below selection */
-  const range = selection.getRangeAt(0);
-  const rects = range.getClientRects();
-  /** Use last rect for multiline selections to position below the end */
-  const lastRect = rects[rects.length - 1] || range.getBoundingClientRect();
-  const centerX = lastRect.left + lastRect.width / 2;
-  const bottomY = lastRect.bottom + 8;
-
-  showFormatContainer(centerX, bottomY);
-}
-
-/**
- * Initialize code formatter
- */
 export function initCodeFormatter(): () => void {
-  document.addEventListener('selectionchange', handleSelectionChange);
+  const observer = new MutationObserver(() => {
+    const group = findXFormattingGroup();
+    if (group) injectIntoGroup(group);
+  });
+  observer.observe(document.body, { childList: true, subtree: true });
+
+  const initial = findXFormattingGroup();
+  if (initial) injectIntoGroup(initial);
 
   return () => {
-    document.removeEventListener('selectionchange', handleSelectionChange);
+    observer.disconnect();
   };
 }
 
-/**
- * Cleanup shared format container
- */
 export function cleanupCodeFormatter(): void {
-  if (formatContainer) {
-    formatContainer.remove();
-    formatContainer = null;
-  }
+  document
+    .querySelectorAll(`[${GROUP_INJECTED_ATTR}]`)
+    .forEach((group) => {
+      group.removeAttribute(GROUP_INJECTED_ATTR);
+      group.querySelectorAll(`.${FORMAT_BTN_CLASS}`).forEach((b) => b.remove());
+    });
 }

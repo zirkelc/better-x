@@ -82,30 +82,17 @@
   transform: translateX(-50%) translateY(0);
 }
 
-/* Code Format Button Group */
-.better-x-format-group {
-  position: fixed;
-  z-index: 10001;
-  display: none;
-  gap: 4px;
-  transform: translateX(-50%);
-}
-
-.better-x-format-btn {
-  padding: 4px 8px;
+/*
+ * Code/Normal buttons injected into X's floating selection toolbar.
+ * Visual styling is inherited from X's Bold/Italic buttons (we clone their
+ * outer classes). This rule only nudges the inner label so the "</>" and
+ * "Aa" text reads at the right size next to the B/I icons.
+ */
+.better-x-format-btn > div {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  font-size: 12px;
-  font-weight: 500;
-  color: rgb(231, 233, 234);
-  background: rgb(30, 39, 50);
-  border: 1px solid rgb(56, 68, 77);
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background-color 0.12s ease;
-}
-
-.better-x-format-btn:hover {
-  background: rgb(39, 51, 64);
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1;
 }
 
 /* Open-in-new-tab button injected next to Grok button in tweet header */
