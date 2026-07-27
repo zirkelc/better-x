@@ -6,3 +6,6 @@
 /stats.html
 *.zip
 .DS_Store
+
+# Throwaway HTML that assets/store/frame.mjs writes while composing screenshots
+assets/store/.build-*.html

@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Better X — settings popup</title>
+
+    <!-- The shipped popup stylesheet, so this render cannot drift from the real UI. -->
+    <link rel="stylesheet" href="../../entrypoints/popup/style.css" />
+
+    <style>
+      /* The popup follows the system theme. Headless Chrome reports "light",
+         so the dark values from the stylesheet's prefers-color-scheme block are
+         pinned here to match the dark store canvas. */
+      body {
+        background: #15202b;
+        color: #e7e9ea;
+      }
+      .hint {
+        color: #71767b;
+        border-top-color: #2f3336;
+      }
+
+      /* Render at 2x so the framed screenshot stays sharp. */
+      html {
+        zoom: 2;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <img src="../../public/icon/icon.svg" alt="" width="28" height="28" />
+      <h1>Better X</h1>
+    </header>
+    <ul id="features">
+      <li><label><input type="checkbox" checked /><span>Character counter</span></label></li>
+      <li><label><input type="checkbox" checked /><span>Word &amp; selection tooltips</span></label></li>
+      <li><label><input type="checkbox" checked /><span>Code formatter buttons</span></label></li>
+      <li><label><input type="checkbox" checked /><span>Open-in-new-tab button</span></label></li>
+    </ul>
+    <p class="hint">Refresh x.com after changing toggles. The right-click menu updates instantly.</p>
+  </body>
+</html>
