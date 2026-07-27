@@ -10,6 +10,8 @@
     "build:firefox": "wxt build -b firefox",
     "zip": "wxt zip",
     "zip:firefox": "wxt zip -b firefox",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "typecheck": "wxt prepare && tsc --noEmit",
     "icons": "node scripts/generate-icons.mjs",
     "postinstall": "wxt prepare"
@@ -23,8 +25,10 @@
   "license": "MIT",
   "packageManager": "pnpm@10.29.3",
   "devDependencies": {
+    "happy-dom": "^20.11.1",
     "sharp": "^0.34.5",
     "typescript": "^5.9.3",
+    "vitest": "^4.1.10",
     "wxt": "^0.20.25"
   }
 }

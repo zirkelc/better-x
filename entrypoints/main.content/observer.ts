@@ -39,30 +39,41 @@ export function startObserver(settings: Settings): () => void {
     initAllPostOpenButtons();
   }
 
-  const observer = new MutationObserver((mutations) => {
-    const shouldCheck = mutations.some((mutation) => {
-      if (mutation.type !== 'childList' || mutation.addedNodes.length === 0) {
-        return false;
-      }
-      return Array.from(mutation.addedNodes).some((node) => {
-        if (node.nodeType !== Node.ELEMENT_NODE) return false;
-        const element = node as Element;
-        return (
-          element.matches?.(SELECTORS.TEXTAREA) ||
-          element.matches?.(SELECTORS.TEXTBOX_FALLBACK) ||
-          element.matches?.(SELECTORS.ARTICLE) ||
-          element.matches?.(SELECTORS.COUNTDOWN_CIRCLE) ||
-          element.querySelector?.(SELECTORS.TEXTAREA) ||
-          element.querySelector?.(SELECTORS.TEXTBOX_FALLBACK) ||
-          element.querySelector?.(SELECTORS.ARTICLE) ||
-          element.querySelector?.(SELECTORS.COUNTDOWN_CIRCLE)
-        );
-      });
-    });
+  let scanHandle: number | null = null;
 
-    if (shouldCheck) {
+  /**
+   * Coalesce the scans to one pass per frame. Both scans are idempotent —
+   * every element they touch carries an init marker — so running one more
+   * often than strictly needed costs three selector queries.
+   */
+  function scheduleScan(): void {
+    if (scanHandle !== null) return;
+    scanHandle = requestAnimationFrame(() => {
+      scanHandle = null;
       checkForTextareas();
       checkForArticles();
+    });
+  }
+
+  const observer = new MutationObserver((mutations) => {
+    /**
+     * Any inserted element is a reason to rescan. Matching the inserted node
+     * against the elements we mount onto would miss the common case: a post
+     * arrives in one batch and the parts we attach to (its More menu, the
+     * compose progress ring) arrive in a later one, so the batch that
+     * completes the post carries no node we would recognise, and the post is
+     * never picked up again.
+     */
+    const hasAddedElements = mutations.some(
+      (mutation) =>
+        mutation.type === 'childList' &&
+        Array.from(mutation.addedNodes).some(
+          (node) => node.nodeType === Node.ELEMENT_NODE,
+        ),
+    );
+
+    if (hasAddedElements) {
+      scheduleScan();
     }
   });
 
@@ -77,6 +88,10 @@ export function startObserver(settings: Settings): () => void {
 
   return () => {
     observer.disconnect();
+    if (scanHandle !== null) {
+      cancelAnimationFrame(scanHandle);
+      scanHandle = null;
+    }
     cleanups.forEach((c) => c());
     cleanups.length = 0;
     if (codeFormatterCleanup) {
