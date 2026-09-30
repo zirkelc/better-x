@@ -5,7 +5,7 @@ Reference for the CWS developer dashboard submission. Not shipped in the extensi
 ## Package
 
 - Build: `pnpm zip`
-- Artifact: `.output/better-x-<version>-chrome.zip` (currently `better-x-1.0.0-chrome.zip`, 16.3 kB)
+- Artifact: `.output/better-x-<version>-chrome.zip` (currently `better-x-1.1.0-chrome.zip`, 16.3 kB)
 - Version lives in `package.json`; WXT copies it into the generated manifest.
 - Firefox build (not part of this submission): `pnpm zip:firefox`
 
@@ -31,7 +31,7 @@ Character counter, word and selection tooltips, code formatting, and open-in-new
 **Detailed description** (max 16,000 chars)
 
 ```
-Better X adds four small, self-contained upgrades to x.com. Nothing is replaced, nothing is hidden, and every feature is a toggle you can turn off. A master switch in the popup turns the whole extension off at once.
+Better X adds five small, self-contained upgrades to x.com. Nothing is replaced, nothing is hidden, and every feature is a toggle you can turn off. A master switch in the popup turns the whole extension off at once.
 
 CHARACTER COUNTER
 A live count sits next to X's own progress ring in the composer, so you can see exactly how many characters you have used without decoding a circle. It mounts when you start typing and disappears when you clear the box.
@@ -40,9 +40,10 @@ WORD AND SELECTION TOOLTIPS
 Hover any word in the composer to see what it costs in characters. Select a phrase and the tooltip switches to counting the selection, which makes trimming a post to fit far less of a guessing game.
 
 CODE FORMATTER
-X renders posts as plain text, so code loses its shape. Better X adds buttons to X's own selection toolbar, next to Bold and Italic: </> converts the selection to Mathematical Monospace Unicode, and Aa converts it back to regular ASCII. The result is real text, so it stays selectable, copyable, and searchable, unlike a screenshot.
+X renders posts as plain text, so code loses its shape. Better X adds two buttons to X's own selection toolbar, next to Bold and Italic: </> converts the selection to Mathematical Monospace Unicode, and Aa converts it back to regular ASCII. The result is real text, so it stays selectable, copyable, and searchable, unlike a screenshot.
 
-A third button, No link, stops X from turning a domain like example.ai into a link. It places an invisible zero-width non-joiner after the dot, so the text looks the same but is not linked. Click it again on the same selection to make the domains linkable again.
+NO LINK
+X turns every domain it sees, like example.ai, into a link, even when you only want to name it. The No link button in the same selection toolbar stops that: it places an invisible zero-width non-joiner after the dot, so the text looks the same but is not linked. Click it again on the same selection to make the domains linkable again.
 
 OPEN POST IN NEW TAB
 Every post header gets a link next to the More menu that opens the post in a background tab, so you keep your place in the timeline. It is a real <a target="_blank"> element, so middle-click and Cmd-click or Ctrl-click behave exactly as you expect. The same action is also available from the right-click menu on any post.
@@ -148,7 +149,7 @@ https://github.com/zirkelc/better-x/blob/main/PRIVACY.md
 ## Submitting (manual — needs your Google login)
 
 1. Sign in at the CWS developer dashboard and create a new item.
-2. Upload `.output/better-x-1.0.0-chrome.zip`.
+2. Upload `.output/better-x-1.1.0-chrome.zip`.
 3. Paste the Store listing fields above; upload the graphic assets from `assets/store/`.
 4. Fill the Privacy tab: single purpose, permission justifications, data disclosures,
    privacy policy URL.
