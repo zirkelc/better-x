@@ -13,7 +13,7 @@
 
 - **Character counter** in the post composer, placed next to X's progress circle. Mounts only when you start typing and disappears when you clear the text.
 - **Word and selection tooltips** when hovering or selecting text inside the composer. Shows the character count of the hovered word or current selection.
-- **Code formatter** buttons that pop up over a text selection, converting between regular ASCII and Mathematical Monospace Unicode (so code-style text survives X's plain-text rendering).
+- **Code formatter** buttons that pop up over a text selection, converting between regular ASCII and Mathematical Monospace Unicode (so code-style text survives X's plain-text rendering). A **No link** button inserts an invisible zero-width non-joiner after the dot of each domain in the selection, so X does not turn `example.ai` into a link. Click it again on the same selection (or use `Aa`) to make the domains linkable again.
 - **Open-in-new-tab button** added to every tweet header, right next to the More menu. Real `<a target="_blank">` so middle-click and Cmd-click also work.
 
 ## Requirements
@@ -44,6 +44,8 @@ Watches the source and re-emits `.output/chrome-mv3-dev/` on every change. Conne
 
 - Content script and CSS edits: HMR, no extension reload.
 - `background.ts`, manifest, or permission changes: full extension reload.
+
+The dev build is named **Better X (Dev)** and uses the orange icon from `assets/icon-dev/`, so you can load it next to the store version and tell them apart.
 
 The dev server does not auto-launch a browser (`webExt.disabled` is set in `wxt.config.ts`), so you can use your existing logged-in Chrome.
 

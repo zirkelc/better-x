@@ -5,7 +5,7 @@ Reference for the CWS developer dashboard submission. Not shipped in the extensi
 ## Package
 
 - Build: `pnpm zip`
-- Artifact: `.output/better-x-<version>-chrome.zip` (currently `better-x-1.0.0-chrome.zip`, 14.7 kB)
+- Artifact: `.output/better-x-<version>-chrome.zip` (currently `better-x-1.0.0-chrome.zip`, 16.3 kB)
 - Version lives in `package.json`; WXT copies it into the generated manifest.
 - Firefox build (not part of this submission): `pnpm zip:firefox`
 
@@ -31,7 +31,7 @@ Character counter, word and selection tooltips, code formatting, and open-in-new
 **Detailed description** (max 16,000 chars)
 
 ```
-Better X adds four small, self-contained upgrades to x.com. Nothing is replaced, nothing is hidden, and every feature is a toggle you can turn off.
+Better X adds four small, self-contained upgrades to x.com. Nothing is replaced, nothing is hidden, and every feature is a toggle you can turn off. A master switch in the popup turns the whole extension off at once.
 
 CHARACTER COUNTER
 A live count sits next to X's own progress ring in the composer, so you can see exactly how many characters you have used without decoding a circle. It mounts when you start typing and disappears when you clear the box.
@@ -40,13 +40,15 @@ WORD AND SELECTION TOOLTIPS
 Hover any word in the composer to see what it costs in characters. Select a phrase and the tooltip switches to counting the selection, which makes trimming a post to fit far less of a guessing game.
 
 CODE FORMATTER
-X renders posts as plain text, so code loses its shape. Better X adds two buttons to X's own selection toolbar, next to Bold and Italic: </> converts the selection to Mathematical Monospace Unicode, and Aa converts it back to regular ASCII. The result is real text, so it stays selectable, copyable, and searchable, unlike a screenshot.
+X renders posts as plain text, so code loses its shape. Better X adds buttons to X's own selection toolbar, next to Bold and Italic: </> converts the selection to Mathematical Monospace Unicode, and Aa converts it back to regular ASCII. The result is real text, so it stays selectable, copyable, and searchable, unlike a screenshot.
+
+A third button, No link, stops X from turning a domain like example.ai into a link. It places an invisible zero-width non-joiner after the dot, so the text looks the same but is not linked. Click it again on the same selection to make the domains linkable again.
 
 OPEN POST IN NEW TAB
 Every post header gets a link next to the More menu that opens the post in a background tab, so you keep your place in the timeline. It is a real <a target="_blank"> element, so middle-click and Cmd-click or Ctrl-click behave exactly as you expect. The same action is also available from the right-click menu on any post.
 
 PRIVACY
-Better X makes no network requests. It collects no data, has no analytics, and needs no account. The only thing it stores is your four on/off toggles, via Chrome's settings sync. All code ships inside the package; nothing is loaded remotely.
+Better X makes no network requests. It collects no data, has no analytics, and needs no account. The only thing it stores is your on/off toggles, via Chrome's settings sync. All code ships inside the package; nothing is loaded remotely.
 
 Open source: https://github.com/zirkelc/better-x
 ```
@@ -87,14 +89,14 @@ in the order above; the first one is what shows in search results.
 **Single purpose**
 
 ```
-Add small, optional UI enhancements to x.com: a character counter and word/selection tooltips in the post composer, monospace formatting buttons for the current selection, and a link that opens a post in a new tab.
+Add small, optional UI enhancements to x.com: a character counter and word/selection tooltips in the post composer, monospace formatting and link-suppression buttons for the current selection, and a link that opens a post in a new tab.
 ```
 
 **Permission justifications**
 
 | Permission                                       | Justification |
 | ------------------------------------------------ | ------------- |
-| `storage`                                         | Persist the user's four feature on/off toggles via `chrome.storage.sync`. No other data is stored. |
+| `storage`                                         | Persist the user's on/off toggles (a master switch and one per feature) via `chrome.storage.sync`. No other data is stored. |
 | `contextMenus`                                    | Add a single "Open Post in New Tab" entry to the right-click menu, shown only on x.com and twitter.com pages and only when the cursor is over a post. |
 | Host access to `https://x.com/*`, `https://twitter.com/*` (content script `matches`) | The extension's entire function is drawing UI into the x.com composer and post headers, which requires running a content script on those pages. It is used for nothing else and no data leaves the page. |
 

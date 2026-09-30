@@ -83,7 +83,7 @@
 }
 
 /*
- * Code/Normal buttons injected into X's floating selection toolbar.
+ * Code/Normal/No-link buttons injected into X's floating selection toolbar.
  * Visual styling is inherited from X's Bold/Italic buttons (we clone their
  * outer classes). This rule only nudges the inner label so the "</>" and
  * "Aa" text reads at the right size next to the B/I icons.
@@ -93,6 +93,13 @@
   font-size: 13px;
   font-weight: 700;
   line-height: 1;
+}
+
+.better-x-format-btn svg {
+  display: block;
+  width: 18px;
+  height: 18px;
+  fill: currentColor;
 }
 
 /* Open-in-new-tab button injected next to Grok button in tweet header */

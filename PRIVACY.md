@@ -23,7 +23,7 @@ All of this happens locally in your browser. Nothing is sent anywhere.
 
 The only stored data is your feature on/off preferences, saved with
 `chrome.storage.sync`. Chrome may sync those preferences between your own signed-in
-Chrome profiles. They contain nothing but four boolean flags. The extension author
+Chrome profiles. They contain nothing but a few boolean flags (one master switch and one per feature). The extension author
 has no access to them.
 
 ## What is not done

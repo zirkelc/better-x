@@ -123,6 +123,35 @@ function extractTokensFromDOM(container: Element): Array<DOMToken> {
 }
 
 /**
+ * Merge rects that sit next to each other on the same line. Some characters
+ * inside a word (for example a zero-width non-joiner) split the word into
+ * two rects, and the width filter below would otherwise drop the shorter one.
+ */
+export function mergeLineRects(rects: Array<DOMRect>): Array<DOMRect> {
+  const tolerance = 1.5;
+  const merged: Array<DOMRect> = [];
+  for (const rect of rects) {
+    const last = merged.at(-1);
+    if (
+      last &&
+      Math.abs(last.top - rect.top) < tolerance &&
+      Math.abs(last.bottom - rect.bottom) < tolerance &&
+      Math.abs(last.right - rect.left) < tolerance
+    ) {
+      merged[merged.length - 1] = new DOMRect(
+        last.left,
+        last.top,
+        rect.right - last.left,
+        last.height,
+      );
+    } else {
+      merged.push(rect);
+    }
+  }
+  return merged;
+}
+
+/**
  * Measure token position using Range API
  * Token already contains its text node reference and offsets
  */
@@ -143,8 +172,9 @@ function measureTokenRects(
 
     /** Filter out phantom rects - only keep rects with width close to measured text */
     const tolerance = 4;
-    return Array.from(rects)
-      .filter((r) => r.width > 0 && r.height > 0)
+    return mergeLineRects(
+      Array.from(rects).filter((r) => r.width > 0 && r.height > 0),
+    )
       .filter((r) => {
         /** Reject rects way wider than the text (phantom rects spanning line breaks) */
         if (r.width > textWidth + tolerance) return false;
