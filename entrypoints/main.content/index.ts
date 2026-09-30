@@ -12,6 +12,7 @@ export default defineContentScript({
   async main() {
     const settings = await getSettings();
     console.log('[Better X] Content script loaded', settings);
+    if (!settings.enabled) return;
 
     const stopObserver = startObserver(settings);
     const stopPostContextMenu = settings.contextMenu ? initPostContextMenu() : null;

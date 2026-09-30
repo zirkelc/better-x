@@ -5,9 +5,12 @@ import {
   getSettings,
   onSettingsChanged,
   patchSettings,
+  type Settings,
 } from '../../utils/settings';
 
 const list = document.getElementById('features') as HTMLUListElement;
+const enabledInput = document.getElementById('toggle-enabled') as HTMLInputElement;
+const nameHeading = document.getElementById('name') as HTMLHeadingElement;
 const inputs = new Map<FeatureKey, HTMLInputElement>();
 
 function buildRows(): void {
@@ -34,13 +37,21 @@ function buildRows(): void {
   }
 }
 
-function applySettingsToInputs(settings: Record<FeatureKey, boolean>): void {
+function applySettingsToInputs(settings: Settings): void {
+  enabledInput.checked = settings.enabled;
+  list.classList.toggle('disabled', !settings.enabled);
   for (const [key, input] of inputs) {
     input.checked = settings[key];
+    input.disabled = !settings.enabled;
   }
 }
 
 async function init(): Promise<void> {
+  /** The dev build carries a different name, so show the one this install has. */
+  nameHeading.textContent = browser.runtime.getManifest().name;
+  enabledInput.addEventListener('change', () => {
+    void patchSettings({ enabled: enabledInput.checked });
+  });
   buildRows();
   applySettingsToInputs(await getSettings());
   onSettingsChanged(applySettingsToInputs);

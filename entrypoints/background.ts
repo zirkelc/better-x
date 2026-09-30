@@ -1,4 +1,4 @@
-import { getSettings, onSettingsChanged } from '../utils/settings';
+import { getSettings, onSettingsChanged, type Settings } from '../utils/settings';
 
 const MENU_ID = 'better-x-open-post';
 
@@ -6,13 +6,19 @@ export default defineBackground(() => {
   let pendingUrl: string | null = null;
   let contextMenuEnabled = true;
 
-  async function syncContextMenuFromSettings(): Promise<void> {
-    const settings = await getSettings();
-    contextMenuEnabled = settings.contextMenu;
+  function applySettings(settings: Settings): void {
+    contextMenuEnabled = settings.enabled && settings.contextMenu;
     if (!contextMenuEnabled) {
       pendingUrl = null;
       browser.contextMenus.update(MENU_ID, { visible: false }).catch(() => {});
     }
+    /** Mark a disabled install on the toolbar icon, so it is clear at a glance which one runs. */
+    browser.action.setBadgeText({ text: settings.enabled ? '' : 'OFF' }).catch(() => {});
+    browser.action.setBadgeBackgroundColor({ color: '#536471' }).catch(() => {});
+  }
+
+  async function syncContextMenuFromSettings(): Promise<void> {
+    applySettings(await getSettings());
   }
 
   browser.runtime.onInstalled.addListener(() => {
@@ -29,13 +35,7 @@ export default defineBackground(() => {
   /** Service worker may wake up without an onInstalled event; sync on every load. */
   void syncContextMenuFromSettings();
 
-  onSettingsChanged((settings) => {
-    contextMenuEnabled = settings.contextMenu;
-    if (!contextMenuEnabled) {
-      pendingUrl = null;
-      browser.contextMenus.update(MENU_ID, { visible: false }).catch(() => {});
-    }
-  });
+  onSettingsChanged(applySettings);
 
   browser.runtime.onMessage.addListener((msg) => {
     if (msg && typeof msg === 'object' && msg.type === 'better-x:tweet-url') {

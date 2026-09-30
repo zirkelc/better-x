@@ -5,7 +5,10 @@ export type FeatureKey =
   | 'openInNewTabButton'
   | 'contextMenu';
 
-export type Settings = Record<FeatureKey, boolean>;
+export type Settings = Record<FeatureKey, boolean> & {
+  /** Master switch. When off, no feature runs, whatever its own toggle says. */
+  enabled: boolean;
+};
 
 export const FEATURE_LABELS: Record<FeatureKey, string> = {
   characterCounter: 'Character counter',
@@ -26,6 +29,7 @@ export const FEATURE_KEYS: ReadonlyArray<FeatureKey> = [
 ];
 
 export const DEFAULT_SETTINGS: Settings = {
+  enabled: true,
   characterCounter: true,
   wordOverlay: true,
   codeFormatter: true,
