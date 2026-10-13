@@ -45,7 +45,7 @@ Watches the source and re-emits `.output/chrome-mv3-dev/` on every change. Conne
 - Content script and CSS edits: HMR, no extension reload.
 - `background.ts`, manifest, or permission changes: full extension reload.
 
-The dev build is named **Better X (Dev)** and uses the orange icon from `assets/icon-dev/`, so you can load it next to the store version and tell them apart.
+The dev build is named **Better X (Dev)** and uses the orange icon from `assets/icon-dev/`, so you can load it next to the store version and tell them apart. To build it once without the dev server, run `pnpm build:dev` (same output directory).
 
 The dev server does not auto-launch a browser (`webExt.disabled` is set in `wxt.config.ts`), so you can use your existing logged-in Chrome.
 
