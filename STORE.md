@@ -5,7 +5,7 @@ Reference for the CWS developer dashboard submission. Not shipped in the extensi
 ## Package
 
 - Build: `pnpm zip`
-- Artifact: `.output/better-x-<version>-chrome.zip` (currently `better-x-1.1.0-chrome.zip`, 16.3 kB)
+- Artifact: `.output/better-x-<version>-chrome.zip` (currently `better-x-1.1.1-chrome.zip`, 16.7 kB)
 - Version lives in `package.json`; WXT copies it into the generated manifest.
 - Firefox build (not part of this submission): `pnpm zip:firefox`
 
@@ -149,7 +149,7 @@ https://github.com/zirkelc/better-x/blob/main/PRIVACY.md
 ## Submitting (manual — needs your Google login)
 
 1. Sign in at the CWS developer dashboard and create a new item.
-2. Upload `.output/better-x-1.1.0-chrome.zip`.
+2. Upload `.output/better-x-1.1.1-chrome.zip`.
 3. Paste the Store listing fields above; upload the graphic assets from `assets/store/`.
 4. Fill the Privacy tab: single purpose, permission justifications, data disclosures,
    privacy policy URL.
